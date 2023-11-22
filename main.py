@@ -5,7 +5,7 @@ import base64
 from datetime import datetime
 
 app = Flask(__name__)
-camera = cv2.VideoCapture(0)  # Utiliza el índice 0 para la cámara integrada de la laptop
+camera = cv2.VideoCapture(0)  # Utiliza el índice 0 para la cámara integrada de la lapto
 
 def capture_images(interval, duration):
     start_time = time.time()
