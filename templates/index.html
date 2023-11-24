@@ -1,12 +1,56 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Proyecto Flask</title>
+    <title>Flask Image Capture</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body>
-    <h1>Hola, Mundo!</h1>
-    <p>Esto es una página de ejemplo.</p>
+    <h1>Flask Image Capture</h1>
+
+    <label for="interval">Intervalo (segundos): </label>
+    <input type="number" id="interval" value="1" min="1">
+
+    <label for="duration">Duración (segundos): </label>
+    <input type="number" id="duration" value="10" min="1">
+
+    <button onclick="getImages()">Obtener Imágenes</button>
+
+    <div id="image-container"></div>
+
+    <script>
+        function getImages() {
+            var interval = document.getElementById('interval').value;
+            var duration = document.getElementById('duration').value;
+
+            $.ajax({
+                url: '/get_images/' + interval + '/' + duration,
+                type: 'GET',
+                success: function(response) {
+                    displayImages(response.images);
+                },
+                error: function(error) {
+                    console.error('Error al obtener imágenes:', error);
+                }
+            });
+        }
+
+        function displayImages(images) {
+            var container = document.getElementById('image-container');
+            container.innerHTML = '';
+
+            images.forEach(function(imageData) {
+                var timestamp = imageData.timestamp;
+                var imageBase64 = imageData.image;
+
+                var imageDiv = document.createElement('div');
+                imageDiv.innerHTML = '<p>Timestamp: ' + timestamp + '</p>' +
+                                     '<img src="data:image/jpeg;base64,' + imageBase64 + '" alt="Captured Image">';
+
+                container.appendChild(imageDiv);
+            });
+        }
+    </script>
 </body>
 </html>
