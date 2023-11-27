@@ -28,6 +28,7 @@
                 url: '/get_images/' + interval + '/' + duration,
                 type: 'GET',
                 success: function(response) {
+                    console.log("Respuesta: ", response)
                     displayImages(response.images);
                 },
                 error: function(error) {
