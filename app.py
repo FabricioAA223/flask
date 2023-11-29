@@ -1,32 +1,33 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, Response
 import cv2
-import time
-import base64
-from datetime import datetime
 
 app = Flask(__name__)
-camera = cv2.VideoCapture('rtsp://192.168.1.44:554/11')  # Utiliza el índice 0 para la cámara integrada de la laptop
-def capture_images(interval, duration):
-    start_time = time.time()
-    images = []
-    while time.time() - start_time < duration:
-        success, frame = camera.read()
-        if success:
-            _, buffer = cv2.imencode('.jpg', frame)
-            image_base64 = base64.b64encode(buffer).decode('utf-8')
-            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            images.append({'image': image_base64, 'timestamp': timestamp})
-            time.sleep(interval)
-    return images
 
+# Función para capturar imágenes de la cámara
+def generate_frames():
+    camera = cv2.VideoCapture('rtsp://192.168.1.44:554/11')  # Reemplaza con la dirección RTSP de tu cámara
+
+    while True:
+        success, frame = camera.read()
+        if not success:
+            break
+        else:
+            _, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+    camera.release()
+
+# Ruta principal para renderizar la plantilla HTML
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index2.html')
 
-@app.route('/get_images/<int:interval>/<int:duration>', methods=['GET'])
-def get_images(interval, duration):
-    images = capture_images(interval, duration)
-    return jsonify({'images': images})
+# Ruta para la transmisión de imágenes desde la cámara
+@app.route('/video_feed')
+def video_feed():
+    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-if __name__ == "__main__":
-    app.run()
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
