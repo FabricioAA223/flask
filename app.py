@@ -22,7 +22,7 @@ def generate_frames():
 # Ruta principal para renderizar la plantilla HTML
 @app.route('/')
 def index():
-    return render_template('index2.html')
+    return render_template('index.html')
 
 # Ruta para la transmisión de imágenes desde la cámara
 @app.route('/video_feed')
