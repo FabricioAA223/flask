@@ -17,7 +17,8 @@ def capture_images(interval, duration):
     while time.time() - start_time < duration:
         success, frame = camera.read()
         if success:
-            _, buffer = cv2.imencode('.jpg', frame)
+            small_frame = cv2.resize(frame, (0,0), fx=(0.25), fy=(0.25))
+            _, buffer = cv2.imencode('.jpg', small_frame)
             image_base64 = base64.b64encode(buffer).decode('utf-8')
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             images.append({'image': image_base64, 'timestamp': timestamp})
