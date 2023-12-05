@@ -12,10 +12,10 @@ app = Flask(__name__)
 
 def capture_images(interval, duration):
     #Camara IP conectada al access point
-    #camera = cv2.VideoCapture('rtsp://192.168.0.100:554/11')  # Nueva conexión a la cámara
+    camera = cv2.VideoCapture('rtsp://192.168.0.100:554/11')  # Nueva conexión a la cámara
 
     #Camara integrada de la laptop
-    camera = cv2.VideoCapture(0 )  # Nueva conexión a la cámara
+    #camera = cv2.VideoCapture(0 )  # Nueva conexión a la cámara
 
     start_time = time.time()
     images = []
