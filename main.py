@@ -8,14 +8,17 @@ from pydrive.drive import GoogleDrive
 import re
 import os
 
+dir_credentials = 'credentials_module.json'
 app = Flask(__name__)
 
 def capture_images(interval, duration):
+    
+    camera = cv2.VideoCapture(0 )  # Nueva conexión a la cámara
     #Camara IP conectada al access point
-    camera = cv2.VideoCapture('rtsp://192.168.0.100:554/11')  # Nueva conexión a la cámara
+    #camera = cv2.VideoCapture('rtsp://192.168.0.100:554/11')  # Nueva conexión a la cámara
 
     #Camara integrada de la laptop
-    #camera = cv2.VideoCapture(0 )  # Nueva conexión a la cámara
+    #
 
     start_time = time.time()
     images = []
@@ -32,15 +35,27 @@ def capture_images(interval, duration):
     camera.release()  # Cierra la conexión a la cámara al finalizar la captura
     return images
 
+def loginGoogleDrive():
+    gauth = GoogleAuth()
+
+    gauth.LoadCredentialsFile(dir_credentials)
+
+    if gauth.access_token_expired:
+        gauth.Refresh()
+        gauth.SaveCredentialsFile(dir_credentials)
+    else:
+        gauth.Authorize()
+
+    return GoogleDrive(gauth)
+
 def create_folder(drive, folder_name):
     folder = drive.CreateFile({'title': folder_name, 'mimeType': 'application/vnd.google-apps.folder'})
     folder.Upload()
     return folder
 
+
 def upload_to_drive(images):
-    gauth = GoogleAuth()
-    gauth.LocalWebserverAuth()
-    drive = GoogleDrive(gauth)
+    drive = loginGoogleDrive()
 
     # Crear una carpeta con el timestamp actual
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
